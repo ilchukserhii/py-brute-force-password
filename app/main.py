@@ -36,13 +36,15 @@ def find_passwords(
         if result in hashes:
             found.append((result, sequence))
 
-    return found
+    if len(found) == 10:
+        return found
+    raise ValueError("Not ten passwords found")
 
 
 def brute_force_password() -> None:
     hashes = set(PASSWORDS_TO_BRUTE_FORCE)
     max_number = 100_000_000
-    workers = multiprocessing.cpu_count() - 1
+    workers = max(multiprocessing.cpu_count() - 1, 1)
     chunk = max_number // workers
     futures = []
 
@@ -58,8 +60,8 @@ def brute_force_password() -> None:
             futures.append(executor.submit(find_passwords, start, end, hashes))
 
         for future in futures:
-            for hashed, password in future.result():
-                print(f"Password found: {hashed} -> {password}")
+            for _, password in future.result():
+                print(f"Password found: {password}")
 
 
 if __name__ == "__main__":
