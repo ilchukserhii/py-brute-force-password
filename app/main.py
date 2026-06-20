@@ -36,9 +36,7 @@ def find_passwords(
         if result in hashes:
             found.append((result, sequence))
 
-    if len(found) == 10:
-        return found
-    raise ValueError("Not ten passwords found")
+    return found
 
 
 def brute_force_password() -> None:
@@ -59,9 +57,15 @@ def brute_force_password() -> None:
 
             futures.append(executor.submit(find_passwords, start, end, hashes))
 
+        all_passwords = []
+
         for future in futures:
-            for _, password in future.result():
-                print(f"Password found: {password}")
+            all_passwords.extend(future.result())
+
+        passwords = sorted({password for _, password in all_passwords})
+
+        for password in passwords:
+            print(password)
 
 
 if __name__ == "__main__":
